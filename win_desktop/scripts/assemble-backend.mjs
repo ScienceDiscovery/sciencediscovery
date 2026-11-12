@@ -689,6 +689,14 @@ const pythonHome = await realpath(pyvenvHome(join(data, "envs", "sd-services")))
 if (!existsSync(join(pythonHome, "python.exe"))) fail(`no python.exe under ${pythonHome}`);
 say(`copying base interpreter from ${pythonHome}`);
 await cp(pythonHome, join(out, "python"), { recursive: true, force: true, filter: pyFilter() });
+// The hosted Windows Python distribution includes python3.exe as a reparse
+// alias for python.exe. It is not used by the payload, and 7-Zip treats the
+// copied alias as an invalid directory while creating the NSIS archive.
+const python3Alias = join(out, "python", "python3.exe");
+if (existsSync(python3Alias)) {
+  await rm(python3Alias, { force: true, recursive: true });
+  say("removed Windows python3.exe alias from the bundled interpreter");
+}
 
 // ---------------------------------------------------------------------------
 // 7b. [windows-desktop] uv venv Scripts\python.exe / pythonw.exe are
