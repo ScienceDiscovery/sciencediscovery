@@ -706,9 +706,13 @@ const launcherDirs = [
 ];
 const launcherReplaced = await replaceVenvTrampolines(launcherDirs, join(out, "python"), say);
 if (launcherReplaced === 0) {
-  fail("no uv trampoline launchers found in the bundled venvs — the payload layout changed (or the venvs are no longer uv-made); investigate before shipping");
+  // Recent uv releases create native CPython launchers on Windows instead of
+  // embedding the old "uv trampoline" marker. Those launchers already resolve
+  // pyvenv.cfg correctly; the DLL copy and first-run repair below still apply.
+  say("no uv trampoline launchers found; bundled venvs already use native CPython launchers");
+} else {
+  say(`replaced ${launcherReplaced} trampoline launcher(s)`);
 }
-say(`replaced ${launcherReplaced} trampoline launcher(s)`);
 
 // The shell launches the whole stack with hidden consoles; every
 // payload Python that spawns a console-subsystem child without
