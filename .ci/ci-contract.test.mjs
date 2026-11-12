@@ -388,6 +388,8 @@ test("Windows distribution gate builds the native Electron installer", async () 
   assert.ok(job, "windows-desktop job was not found");
   assert.match(job, /runs-on: windows-latest/);
   assert.match(job, /needs\.policy\.outputs\.windows_desktop == 'true'/);
+  assert.match(job, /PYTHONUTF8:\s*["']1["']/,
+    "Windows JiuwenSwarm setup must force Python UTF-8 stdio");
   assert.match(job, /uv sync --locked --extra candidates/);
   assert.match(job, /node scripts\/jiuwenswarm\.mjs setup/);
   assert.match(job, /fetch-managed-micromamba\.mjs[\s\S]*--platform win32/);
